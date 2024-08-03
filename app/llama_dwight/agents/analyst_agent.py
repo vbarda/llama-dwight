@@ -1,48 +1,39 @@
-from langchain_core.messages import SystemMessage
-from langgraph.graph.state import StateGraph, END
+from typing import Optional
+from langchain_core.language_models.chat_models import BaseChatModel
+from langgraph.graph.state import StateGraph, END, CompiledStateGraph
 from langgraph.graph.message import MessagesState
 
-from llama_dwight.agents import qa_agent
-from llama_dwight.shared import load_data
-from llama_dwight.tools.pandas import get_schema
-
-DEFAULT_FILEPATH = "data.csv"
+from llama_dwight.tools.base import BaseDataToolKit
+from llama_dwight.agents.qa_agent import make_qa_agent
 
 
-# TODO: make a version of this agent that doesn't need in-memory store for usage outside of LangGraph studio
-class AnalystState(MessagesState):
-    # this serves as an interface for a user to specify the filepath
-    filepath: str
+class AnalystAgent:
+    state_schema: MessagesState
 
+    def __init__(
+        self, llm: BaseChatModel, data_toolkit: Optional[BaseDataToolKit] = None
+    ) -> None:
+        self.llm = llm
+        self.data_toolkit = data_toolkit
+        self.qa_agent = (
+            None if data_toolkit is None else make_qa_agent(llm, data_toolkit)
+        )
 
-class AnalystStateInput(MessagesState):
-    filepath: str
+    def load_data_toolkit(self, state: MessagesState) -> MessagesState:
+        raise NotImplementedError
 
+    def call_qa_agent(self, state: MessagesState) -> MessagesState:
+        if self.qa_agent is None:
+            raise ValueError("Question-answering agent hasn't been initialized.")
 
-def load_data_from_filepath(state: AnalystState) -> AnalystState:
-    """Load data from filepath and set it globally."""
-    filepath = state["filepath"] or DEFAULT_FILEPATH
-    # this is going to modify the global in-memory store
-    load_data(filepath)
-    return state
+        qa_agent_response = self.qa_agent.invoke(state)
+        return {"messages": qa_agent_response["messages"]}
 
-
-def call_qa_agent(state: AnalystState) -> AnalystState:
-    schema = get_schema(state)
-    system_message = SystemMessage(
-        content=f"You are an experienced data analyst that has access to a dataset with the following schema: {schema}"
-    )
-    messages = [system_message] + state["messages"]
-    qa_agent_response = qa_agent.graph.invoke({"messages": messages})
-    return {"messages": [qa_agent_response["messages"][-1]]}
-
-
-workflow = StateGraph(AnalystState, input=AnalystStateInput)
-
-workflow.add_node("load_data", load_data_from_filepath)
-workflow.add_node("qa_agent", call_qa_agent)
-workflow.set_entry_point("load_data")
-workflow.add_edge("load_data", "qa_agent")
-workflow.add_edge("qa_agent", END)
-
-graph = workflow.compile()
+    def compile(self) -> CompiledStateGraph:
+        workflow = StateGraph(self.state_schema)
+        workflow.add_node("load_data", self.load_data_toolkit)
+        workflow.add_node("qa_agent", self.call_qa_agent)
+        workflow.set_entry_point("load_data")
+        workflow.add_edge("load_data", "qa_agent")
+        workflow.add_edge("qa_agent", END)
+        return workflow.compile()

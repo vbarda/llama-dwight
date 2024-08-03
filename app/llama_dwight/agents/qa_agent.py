@@ -1,25 +1,11 @@
-from langgraph.prebuilt.chat_agent_executor import AgentState, create_react_agent
+from langchain_core.language_models.chat_models import BaseChatModel
+from langgraph.prebuilt.chat_agent_executor import create_react_agent
+from langgraph.graph.state import CompiledStateGraph
 
-import pandas as pd
-
-from llama_dwight import config
-from llama_dwight.llms import LLMName, get_llm
-from llama_dwight.tools.pandas import aggregate
-
-llm = get_llm(LLMName.OLLAMA_3_1_8B)
+from llama_dwight.tools.base import BaseDataToolKit
 
 
-if config.IS_LANGGRAPH_API:
-    # we can't pass dataframes around in the state as dataframes are not serializable
-    # and custom serializer is not an option for using it with LangGraph API / Studio
-    # so we are using an in-memory dataframe instead. this state is just the default AgentState
-    class CustomAgentState(AgentState):
-        pass
-else:
-    # for interactive workflows in the notebook we are using dataframe from the state
-    class CustomAgentState(AgentState):
-        df: pd.DataFrame
-
-
-tools = [aggregate]
-graph = create_react_agent(llm, tools, state_schema=CustomAgentState)
+def make_qa_agent(llm: BaseChatModel, toolkit: BaseDataToolKit) -> CompiledStateGraph:
+    schema = toolkit.get_schema()
+    system_prompt = f"You are an experienced data analyst that has access to a dataset with the following schema: {schema}"
+    return create_react_agent(llm, toolkit.get_tools(), state_modifier=system_prompt)
