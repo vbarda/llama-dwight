@@ -1,9 +1,16 @@
 import abc
-from typing import Any
+from typing import Any, Optional
 
 from langchain_core.tools import BaseTool, StructuredTool
 
-from llama_dwight.tools.types import AggregationFunc, AggregationInput, GroupbyInput
+from llama_dwight.tools.types import (
+    AggregationFunc,
+    AggregationInput,
+    GroupbyInput,
+    FilterSpec,
+    FilterInput,
+    SortInput,
+)
 
 
 class BaseDataToolKit(abc.ABC):
@@ -24,12 +31,32 @@ class BaseDataToolKit(abc.ABC):
         """Group by a list of columns and calculate aggregated value for each group. See GroupbyInput for args description."""
         raise NotImplementedError
 
+    def filter(self, filters: list[FilterSpec]) -> None:
+        """Filter the data."""
+        raise NotImplementedError
+
+    def sort(self, column: str, ascending: bool, limit: Optional[int]) -> None:
+        """Sort the data or find top/bottom n values."""
+        raise NotImplementedError
+
     def get_schema(self) -> dict:
         """Get schema associated with the data toolkit."""
         raise NotImplementedError
 
     def get_tools(self) -> list[BaseTool]:
         return [
+            StructuredTool(
+                name="filter",
+                description='Filter dataset using a list of filter specifications. Example: "transactions greater than 10"',
+                func=self.filter,
+                args_schema=FilterInput,
+            ),
+            StructuredTool(
+                name="sort",
+                description='Sort dataset and optionally find top/botton n values. Example: "largest companies" / "bottom 5 cities by population"',
+                func=self.sort,
+                args_schema=SortInput,
+            ),
             StructuredTool(
                 name="aggregate",
                 description='Aggregate column values. DO NOT use this if asked for a group by aggregation. Example: "what was the total sales amount?"',
@@ -43,3 +70,7 @@ class BaseDataToolKit(abc.ABC):
                 args_schema=GroupbyInput,
             ),
         ]
+
+    def clear(self) -> None:
+        """Clear any intermediate toolkit state."""
+        raise NotImplementedError

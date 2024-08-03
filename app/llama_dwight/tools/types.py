@@ -1,4 +1,5 @@
 import enum
+from typing import Optional
 
 from langchain_core.pydantic_v1 import BaseModel, Field
 
@@ -33,4 +34,42 @@ class GroupbyInput(BaseModel):
     )
     aggregation_func: AggregationFunc = Field(
         description="Aggregation function to apply to the value column, for each group. REMEMBER: Average always refers to 'mean'"
+    )
+
+
+class FilterOperator(str, enum.Enum):
+    GREATER = ">"
+    GREATER_OR_EQ = ">="
+    LESS = "<"
+    LESS_OR_EQ = "<="
+    EQ = "="
+    NEQ = "!="
+
+
+class FilterValueType(str, enum.Enum):
+    NUMBER = "number"
+    STRING = "string"
+    DATETIME = "datetime"
+
+
+class FilterSpec(BaseModel):
+    column: str = Field(description="Column to filter on")
+    value: str = Field(description="Value to use as a filter")
+    value_type: FilterValueType = Field(
+        description="Value type to use for the filter value"
+    )
+    operator: FilterOperator = Field(description="Filter operator to use")
+
+
+class FilterInput(BaseModel):
+    filters: list[FilterSpec] = Field(
+        description="List of filter specifications to filter data on"
+    )
+
+
+class SortInput(BaseModel):
+    column: str = Field(description="Column to sort on")
+    ascending: bool = Field(description="Whether to sort ascending or descending")
+    limit: Optional[int] = Field(
+        description="Optional: limit to the first n results. For descending sort this means n largest values, for ascending - n smallest values"
     )

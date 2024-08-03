@@ -20,7 +20,8 @@ class PandasAnalystAgent(AnalystAgent):
 
     def load_data_toolkit(self, state: PandasAnalystState) -> PandasAnalystState:
         if self.data_toolkit is not None:
-            # nothing to do here
+            # clear toolkit state and continue
+            self.data_toolkit.clear()
             return state
 
         filepath = state["filepath"] or DEFAULT_FILEPATH
