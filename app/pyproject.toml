@@ -2,8 +2,7 @@
 name = "llama-dwight"
 version = "0.1.0"
 description = "LangGraph implementation of llama-dwight agents"
-authors = ["Your Name <you@example.com>"]
-readme = "README.md"
+authors = []
 packages = [{include = "llama_dwight"}]
 
 [tool.poetry.dependencies]
@@ -14,6 +13,7 @@ langchain-groq = "^0.1.9"
 
 [tool.poetry.group.dev.dependencies]
 langgraph-cli = "^0.1.50"
+ruff = "^0.5.6"
 
 [build-system]
 requires = ["poetry-core"]
