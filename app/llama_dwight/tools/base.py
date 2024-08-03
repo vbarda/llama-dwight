@@ -3,7 +3,7 @@ from typing import Any
 
 from langchain_core.tools import BaseTool, StructuredTool
 
-from llama_dwight.tools.types import AggregationFunc, AggregationInput
+from llama_dwight.tools.types import AggregationFunc, AggregationInput, GroupbyInput
 
 
 class BaseDataToolKit(abc.ABC):
@@ -12,12 +12,16 @@ class BaseDataToolKit(abc.ABC):
         columns: list[str],
         aggregation_func: AggregationFunc,
     ) -> dict[str, Any]:
-        """Aggregate column values.
+        """Aggregate column values. See AggregationInput for args description."""
+        raise NotImplementedError
 
-        Args:
-            columns: List of columns to perform aggregation on
-            aggregation_func: Aggregation function to apply to the columns. REMEMBER: Average always refers to 'mean'
-        """
+    def groupby(
+        self,
+        groupby_columns: list[str],
+        value_column: str,
+        aggregation_func: AggregationFunc,
+    ) -> dict[tuple[str, ...], Any]:
+        """Group by a list of columns and calculate aggregated value for each group. See GroupbyInput for args description."""
         raise NotImplementedError
 
     def get_schema(self) -> dict:
@@ -28,8 +32,14 @@ class BaseDataToolKit(abc.ABC):
         return [
             StructuredTool(
                 name="aggregate",
-                description="Aggregate column values.",
+                description='Aggregate column values. DO NOT use this if asked for a group by aggregation. Example: "what was the total sales amount?"',
                 func=self.aggregate,
                 args_schema=AggregationInput,
-            )
+            ),
+            StructuredTool(
+                name="groupby",
+                description='Group by a list of columns and calculate aggregated value for each group. Example: "what was the total sales amount?"',
+                func=self.groupby,
+                args_schema=GroupbyInput,
+            ),
         ]
