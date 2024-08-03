@@ -25,10 +25,6 @@ class BaseDataToolKit(abc.ABC):
         raise NotImplementedError
 
     def get_tools(self) -> list[BaseTool]:
-        """Get a list of tools from the data toolkit."""
-        raise NotImplementedError
-
-    def get_tools(self) -> list[BaseTool]:
         return [
             StructuredTool(
                 name="aggregate",
