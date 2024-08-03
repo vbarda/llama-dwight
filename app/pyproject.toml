@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "llama-dwight"
+version = "0.1.0"
+description = "LangGraph implementation of llama-dwight agents"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "llama_dwight"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+langgraph = "^0.1.19"
+langchain-groq = "^0.1.9"
+
+
+[tool.poetry.group.dev.dependencies]
+langgraph-cli = "^0.1.50"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
