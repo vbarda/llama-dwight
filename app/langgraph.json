@@ -1,7 +1,7 @@
 {
   "dependencies": ["."],
   "graphs": {
-    "agent": "./llama_dwight/agent.py:graph"
+    "agent": "./llama_dwight/agents/analyst_agent.py:graph"
   },
   "env": ".env"
 }
