@@ -1,9 +1,10 @@
-from langchain_groq import ChatGroq
 from langchain_core.tools import tool
 
 from langgraph.prebuilt import create_react_agent
 
-llm = ChatGroq(model="llama-3.1-8b-instant")
+from llama_dwight.llms import LLMName, get_llm
+
+llm = get_llm(LLMName.GROQ_LLAMA_3_1_8B)
 
 
 @tool
