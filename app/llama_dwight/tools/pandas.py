@@ -7,7 +7,9 @@ from llama_dwight.tools.base import BaseDataToolKit
 from llama_dwight.tools.types import AggregationFunc, validate_aggregation_func
 
 
-def convert_filter_value(value: str, value_type: FilterValueType) -> Union[str, float]:
+def convert_filter_value(
+    value: str, value_type: FilterValueType
+) -> Union[str, float, pd.Timestamp]:
     if value_type == FilterValueType.STRING:
         return value
     elif value_type == FilterValueType.NUMBER:

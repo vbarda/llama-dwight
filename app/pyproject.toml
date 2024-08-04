@@ -11,6 +11,7 @@ langgraph = "^0.1.19"
 langchain-groq = "^0.1.9"
 langchain-ollama = "^0.1.1"
 pandas = "^2.2.2"
+sqlalchemy = "^2.0.31"
 
 
 [tool.poetry.group.dev.dependencies]

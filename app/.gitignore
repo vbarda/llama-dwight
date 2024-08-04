@@ -3,3 +3,4 @@ __pycache__/
 .env
 .langgraph-data
 *.csv
+*.db
