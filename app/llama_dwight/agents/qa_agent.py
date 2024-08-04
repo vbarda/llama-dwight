@@ -9,10 +9,10 @@ from langchain_core.runnables.config import (
 from langchain_core.messages import AIMessage, AnyMessage, ToolCall, ToolMessage
 from langgraph.prebuilt.chat_agent_executor import (
     AgentState,
-    create_react_agent,
     _get_model_preprocessing_runnable,
 )
 from langgraph.graph.state import CompiledStateGraph, StateGraph, END
+from langgraph.pregel.types import RetryPolicy
 from langgraph.prebuilt.tool_node import ToolNode
 
 from llama_dwight.tools.base import BaseDataToolKit
@@ -170,7 +170,7 @@ def make_qa_agent(llm: BaseChatModel, toolkit: BaseDataToolKit) -> CompiledState
             return "continue"
 
     workflow = StateGraph(AgentState)
-    workflow.add_node("agent", call_model)
+    workflow.add_node("agent", call_model, retry=RetryPolicy(max_attempts=2))
     # this is the only thing that's different from create_react_agent
     workflow.add_node("tools", SequentialToolNode(tools))
     workflow.set_entry_point("agent")
