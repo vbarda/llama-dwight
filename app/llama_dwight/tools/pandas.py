@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Union, Optional
 
 import pandas as pd
 
@@ -18,6 +18,15 @@ def convert_filter_value(value: str, value_type: FilterValueType) -> Union[str, 
         raise ValueError(f"Unsupported value type '{value_type}'")
 
 
+def preprocess_df(df: pd.DataFrame) -> pd.DataFrame:
+    for column_name in df.columns:
+        if "date" in column_name.lower():
+            try:
+                df[column_name] = pd.to_datetime(df[column_name])
+            except ValueError:
+                continue
+
+
 class PandasDataToolKit(BaseDataToolKit):
     def __init__(self, df: pd.DataFrame) -> None:
         self.df = df
@@ -26,12 +35,16 @@ class PandasDataToolKit(BaseDataToolKit):
         self.current_df = df.copy()
 
     @classmethod
-    def from_filepath(cls, filepath: str) -> "PandasDataToolKit":
+    def from_filepath(
+        cls, filepath: str, preprocess: bool = False
+    ) -> "PandasDataToolKit":
         """Load pandas toolkit from a filepath."""
         if not filepath.endswith(".csv"):
             raise ValueError("Only accepting CSV files.")
 
         df = pd.read_csv(filepath)
+        if preprocess:
+            preprocess_df(df)
         return cls(df)
 
     def get_schema(self) -> dict:
@@ -57,6 +70,7 @@ class PandasDataToolKit(BaseDataToolKit):
         groupby_columns: list[str],
         value_column: str,
         aggregation_func: AggregationFunc,
+        freq: Optional[str],
     ) -> dict[tuple[str, ...], Any]:
         if not isinstance(groupby_columns, list):
             raise TypeError(
@@ -64,9 +78,16 @@ class PandasDataToolKit(BaseDataToolKit):
             )
 
         validate_aggregation_func(aggregation_func)
-        agg_df = self.current_df.groupby(groupby_columns)[value_column].agg(
-            aggregation_func
-        )
+        if freq is None:
+            by = groupby_columns
+        else:
+            if len(groupby_columns) > 1:
+                raise ValueError(
+                    "Can only group by a single date column when frequency is specified"
+                )
+
+            by = pd.Grouper(key=groupby_columns[0], freq=freq)
+        agg_df = self.current_df.groupby(by)[value_column].agg(aggregation_func)
         self.current_df = agg_df.reset_index()
         return agg_df.to_dict()
 

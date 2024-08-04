@@ -25,7 +25,7 @@ class PandasAnalystAgent(AnalystAgent):
             return state
 
         filepath = state["filepath"] or DEFAULT_FILEPATH
-        data_toolkit = PandasDataToolKit.from_filepath(filepath)
+        data_toolkit = PandasDataToolKit.from_filepath(filepath, preprocess=True)
         self.data_toolkit = data_toolkit
         self.qa_agent = make_qa_agent(self.llm, data_toolkit)
         return state

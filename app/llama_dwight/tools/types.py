@@ -9,7 +9,7 @@ class ToolName(str, enum.Enum):
     FILTER = "filter"
     SORT = "sort"
     AGGREGATE = "aggregate"
-    GROUPBY = "groupby"
+    GROUPBY = "groupby_aggregate"
 
 
 @enum.unique
@@ -36,6 +36,13 @@ class AggregationInput(BaseModel):
     )
 
 
+@enum.unique
+class GroupbyFreq(str, enum.Enum):
+    MONTHLY = "ME"
+    QUARTERLY = "QE"
+    YEARLY = "YE"
+
+
 class GroupbyInput(BaseModel):
     groupby_columns: list[str] = Field(description="List of columns to group by")
     value_column: str = Field(
@@ -43,6 +50,9 @@ class GroupbyInput(BaseModel):
     )
     aggregation_func: AggregationFunc = Field(
         description="Aggregation function to apply to the value column, for each group. REMEMBER: Average always refers to 'mean'"
+    )
+    freq: GroupbyFreq = Field(
+        description="Frequency for grouping by a date column. Values: 'ME' = monthly, 'QE' = quarterly, 'YE' = yearly"
     )
 
 

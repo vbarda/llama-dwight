@@ -6,18 +6,22 @@ from langgraph.checkpoint import BaseCheckpointSaver
 from langgraph.graph.message import MessagesState
 
 from llama_dwight.tools.base import BaseDataToolKit
+from llama_dwight.tools.types import ToolName
 from llama_dwight.agents.qa_agent import make_qa_agent
 
 
 PLAN_SYSTEM_PROMPT = """You are an experienced data analyst that has access to a dataset with the following schema: {schema}."
 You need to help a junior data analyst answer the following question: {question}.
-Junior analyst has access to the following tools: {available_tools}."""
+Junior analyst has access to the following tools: {available_tools}.
 
-PLAN_MESSAGE = """Write a step-by-step plan for the junior analyst to answer the question.
+DO NOT include any date preprocessing in the steps, the tools will automatically handle dates.
+"""
+
+PLAN_MESSAGE = f"""Write a step-by-step plan for the junior analyst to answer the question.
 If the plan has multiple steps, the steps should be in the following order:
-- first, use the `filter` tool (if relevant)
-- then, use the `sort` tool (if any)
-- finally, use `aggregate` or `groupby` tool. Never use `aggregate` tool after `groupby`."""
+- first, use the `{ToolName.FILTER.value}` tool (if relevant)
+- then, use the `{ToolName.SORT.value}` tool (if any)
+- finally, use `{ToolName.AGGREGATE.value}` or `{ToolName.GROUPBY.value}` tool."""
 
 
 class AnalystAgent:
