@@ -4,6 +4,15 @@ from typing import Optional
 from langchain_core.pydantic_v1 import BaseModel, Field
 
 
+@enum.unique
+class ToolName(str, enum.Enum):
+    FILTER = "filter"
+    SORT = "sort"
+    AGGREGATE = "aggregate"
+    GROUPBY = "groupby"
+
+
+@enum.unique
 class AggregationFunc(str, enum.Enum):
     SUM = "sum"
     MIN = "min"

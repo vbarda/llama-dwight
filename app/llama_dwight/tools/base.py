@@ -10,6 +10,7 @@ from llama_dwight.tools.types import (
     FilterSpec,
     FilterInput,
     SortInput,
+    ToolName,
 )
 
 
@@ -46,25 +47,25 @@ class BaseDataToolKit(abc.ABC):
     def get_tools(self) -> list[BaseTool]:
         return [
             StructuredTool(
-                name="filter",
+                name=ToolName.FILTER,
                 description='Filter dataset using a list of filter specifications. Example: "transactions greater than 10"',
                 func=self.filter,
                 args_schema=FilterInput,
             ),
             StructuredTool(
-                name="sort",
+                name=ToolName.SORT,
                 description='Sort dataset and optionally find top/botton n values. Example: "largest companies" / "bottom 5 cities by population"',
                 func=self.sort,
                 args_schema=SortInput,
             ),
             StructuredTool(
-                name="aggregate",
+                name=ToolName.AGGREGATE,
                 description='Aggregate column values. DO NOT use this if asked for a group by aggregation. Example: "what was the total sales amount?"',
                 func=self.aggregate,
                 args_schema=AggregationInput,
             ),
             StructuredTool(
-                name="groupby",
+                name=ToolName.GROUPBY,
                 description='Group by a list of columns and calculate aggregated value for each group. Example: "what was the total sales amount?"',
                 func=self.groupby,
                 args_schema=GroupbyInput,
