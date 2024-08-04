@@ -6,7 +6,7 @@ from llama_dwight.llms import LLMName, get_llm
 from llama_dwight.tools.pandas import PandasDataToolKit
 
 DEFAULT_FILEPATH = "data.csv"
-llm = get_llm(LLMName.OLLAMA_3_1_8B)
+llm = get_llm(LLMName.GROQ_LLAMA_3_1_70B)
 
 
 class PandasAnalystState(MessagesState):

@@ -19,10 +19,7 @@ from llama_dwight.tools.base import BaseDataToolKit
 from llama_dwight.tools.types import ToolName
 
 SYSTEM_PROMPT = """You are an experienced data analyst that has access to a dataset with the following schema: {schema}."
-When answering complex questions, think step by step. Break the problem down into a series of the following steps:
-- first, use `filter` (if relevant)
-- then, use `sort` (if any)
-- finally, use `aggregate` or `groupby`. Never apply `aggregate` after `groupby`.
+You are given a question about the dataset and a detailed step-by-step plan to answer it.
 
 REMEMBER:
 - Only use column names from the originally provided schema.
