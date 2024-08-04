@@ -19,6 +19,7 @@ class AggregationFunc(str, enum.Enum):
     MAX = "max"
     MEAN = "mean"
     MEDIAN = "median"
+    COUNT = "count"
 
 
 def validate_aggregation_func(aggregation_func: AggregationFunc) -> None:
