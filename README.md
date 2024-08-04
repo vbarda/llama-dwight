@@ -41,3 +41,54 @@ Example queries:
 - What is the average order value for each of the customer segments?
 - What was maximum monthly total sales amount in 2017
 - What were the average quarterly sales in New York in 2018?
+
+## Usage
+
+First, navigate to `/app` and run `poetry install --with dev`
+
+### Pandas Agent
+
+To interact with the agent you can use the code below. You can also use 
+
+```python
+from dotenv import load_dotenv
+from langgraph.checkpoint import MemorySaver
+
+from llama_dwight.tools.pandas import PandasDataToolKit
+from llama_dwight.llms import get_llm, LLMName
+from llama_dwight.agents.pandas_analyst_agent import PandasAnalystAgent
+
+_ = load_dotenv()
+
+df = pd.read_csv("data.csv")
+
+llm_groq_70b = get_llm(LLMName.GROQ_LLAMA_3_1_70B)
+
+checkpointer = MemorySaver()
+toolkit = PandasDataToolKit(df)
+pandas_agent = PandasAnalystAgent(llm_groq_70b, toolkit, checkpointer)
+pandas_agent_graph = pandas_agent.compile()
+
+input_ = {"messages": [("human", "What are 3 states with the largest avg sales in the west?")]}
+config = {"configurable": {"thread_id": "1"}}
+result = pandas_agent_graph.invoke(input_, config)
+
+# review the message
+result["messages"][-1].pretty_print()
+
+# update
+updated_message = result["messages"][-1]
+updated_message.content = "UPDATE THE PLAN HERE"
+pandas_agent_graph.update_state(config, {"messages": [updated_message]})
+
+# continue execution from here
+final_result = pandas_agent_graph.invoke(None, config)
+```
+
+## Usage (server)
+
+If you want to interact with the app, you would need to have an active LangSmith account, as the app requires LangGraph Cloud.
+Follow instructions [here]https://docs.smith.langchain.com/how_to_guides/setup/create_account_api_key.
+
+Then download [LangGraph Studio](https://github.com/langchain-ai/langgraph-studio). In the Studio, select the project (`/app` directory from this repo) and choose `pandas_agent`. Then you can interact with the graph by specifying `messages` input with the user query.
+```
