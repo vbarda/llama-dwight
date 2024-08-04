@@ -2,7 +2,7 @@
 
 ## Assistant (to the) Regional Data Science Manager
 
-![llama_dwight](https://github.com/user-attachments/assets/35022328-ee7c-43a2-8a7f-dfb906531ad3)
+![llama_dwight_small](https://github.com/user-attachments/assets/f12ac075-1d0c-492a-96e0-26d393f6fad0)
 
 Llama Dwight an app for performing exploratory data analysis with Pandas & SQL. You can use natural language queries to ask questions about your dataset, and approve agent-suggested data analysis plan to ensure you get the most precise answer.
 
