@@ -102,6 +102,7 @@ class PandasDataToolKit(BaseDataToolKit):
 
         # set intermediate outputs to filtered df
         self.current_df = self.current_df[mask]
+        return "Successfully filtered data."
 
     def sort(self, column: str, ascending: bool, limit: int | None) -> None:
         if limit is None:
@@ -110,6 +111,11 @@ class PandasDataToolKit(BaseDataToolKit):
             self.current_df = self.current_df.nsmallest(limit, column)
         else:
             self.current_df = self.current_df.nlargest(limit, column)
+
+        if limit:
+            return self.current_df.to_dict(orient="records")
+        else:
+            return "Successfully sorted data."
 
     def clear(self) -> None:
         self.current_df = self.df.copy()
