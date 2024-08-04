@@ -66,7 +66,7 @@ class AnalystAgent:
         qa_agent_response = self.qa_agent.invoke(state)
         return {"messages": qa_agent_response["messages"]}
 
-    def compile(self) -> CompiledStateGraph:
+    def compile(self, should_interrupt: bool = True) -> CompiledStateGraph:
         workflow = StateGraph(self.state_schema)
         workflow.add_node("load_data", self.load_data_toolkit)
         workflow.add_node("create_plan", self.create_plan)
@@ -75,6 +75,7 @@ class AnalystAgent:
         workflow.add_edge("load_data", "create_plan")
         workflow.add_edge("create_plan", "qa_agent")
         workflow.add_edge("qa_agent", END)
+        interrupt_before = ["qa_agent"] if should_interrupt else None
         return workflow.compile(
-            interrupt_before=["qa_agent"], checkpointer=self.checkpointer
+            interrupt_before=interrupt_before, checkpointer=self.checkpointer
         )
