@@ -179,3 +179,5 @@ class SQLDataToolKit(BaseDataToolKit):
             view_name = self.views.pop()
             with self.engine.connect() as conn:
                 conn.execute(sql_text(f"DROP VIEW IF EXISTS {view_name}"))
+
+        self.create_view(f"SELECT * from {self.table_name}")
