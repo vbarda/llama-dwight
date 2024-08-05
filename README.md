@@ -85,10 +85,11 @@ pandas_agent_graph.update_state(config, {"messages": [updated_message]})
 final_result = pandas_agent_graph.invoke(None, config)
 ```
 
-## Usage (server)
+## Usage (LangGraph Studio)
 
-If you want to interact with the app, you would need to have an active LangSmith account, as the app requires LangGraph Cloud.
-Follow instructions [here]https://docs.smith.langchain.com/how_to_guides/setup/create_account_api_key.
+If you want to interact with the app, you would need to download and install [LangGraph Studio](https://github.com/langchain-ai/langgraph-studio).
 
-Then download [LangGraph Studio](https://github.com/langchain-ai/langgraph-studio). In the Studio, select the project (`/app` directory from this repo) and choose `pandas_agent`. Then you can interact with the graph by specifying `messages` input with the user query.
-```
+1. In the Studio app, select the project (`/app` directory from this repo) and choose the agent (e.g. `pandas_agent`) in the top-left corner. This will load the graph agents and start the server.
+2. Then you can interact with the graph by specifying your query in the `messages` field of the input section (bottom left). If you want to provide custom data, you can specify `filepath` in the input section, alongside `messages`.
+
+**Note**: the data file needs to be in the `/app` directory as well. Only CSV is supported at the moment.
